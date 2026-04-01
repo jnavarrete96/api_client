@@ -12,6 +12,11 @@ spring:
       mode: always       # ejecuta schema.sql al arrancar
       schema-locations: classpath:schema.sql
 
+  jackson:
+    date-format: yyyy-MM-dd
+    serialization:
+      write-dates-as-timestamps: false
+
 logging:
   level:
     root: INFO
