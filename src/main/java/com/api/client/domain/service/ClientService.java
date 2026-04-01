@@ -1,6 +1,7 @@
 package com.api.client.domain.service;
 
 import com.api.client.domain.exception.DuplicateClientException;
+import com.api.client.domain.exception.InvalidDateRangeException;
 import com.api.client.domain.model.Client;
 import com.api.client.domain.model.ClientSearchCriteria;
 import com.api.client.domain.port.in.ClientUseCase;
@@ -34,6 +35,10 @@ public class ClientService implements ClientUseCase {
     @Override
     public Mono<Client> createClient(Client client) {
         log.info("Creating client with email: {}", client.getEmail());
+
+        if (client.getEndDate() != null && client.getEndDate().isBefore(client.getStartDate())) {
+            return Mono.error(new InvalidDateRangeException());
+        }
 
         return repository.findByEmail(client.getEmail())
                 .flatMap(existing -> {
