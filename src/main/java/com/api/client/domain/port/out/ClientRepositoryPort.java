@@ -1,10 +1,9 @@
 package com.api.client.domain.port.out;
 
 import com.api.client.domain.model.Client;
+import com.api.client.domain.model.ClientSearchCriteria;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.LocalDate;
 
 public interface ClientRepositoryPort {
 
@@ -16,11 +15,5 @@ public interface ClientRepositoryPort {
 
     Mono<Client> save(Client client);
 
-    Flux<Client> advancedSearch(
-            String sharedKey,
-            String name,
-            String email,
-            LocalDate startDate,
-            LocalDate endDate
-    );
+    Flux<Client> advancedSearch(ClientSearchCriteria criteria);
 }

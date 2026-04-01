@@ -2,6 +2,7 @@ package com.api.client.domain.service;
 
 import com.api.client.domain.exception.DuplicateClientException;
 import com.api.client.domain.model.Client;
+import com.api.client.domain.model.ClientSearchCriteria;
 import com.api.client.domain.port.in.ClientUseCase;
 import com.api.client.domain.port.out.ClientRepositoryPort;
 import lombok.RequiredArgsConstructor;
@@ -45,9 +46,9 @@ public class ClientService implements ClientUseCase {
     }
 
     @Override
-    public Flux<Client> advancedSearch(String sharedKey, String name, String email, LocalDate startDate, LocalDate endDate) {
+    public Flux<Client> advancedSearch(ClientSearchCriteria criteria) {
         log.info("Performing advanced search");
-        return repository.advancedSearch(sharedKey, name, email, startDate, endDate);
+        return repository.advancedSearch(criteria);
     }
 
     @Override
