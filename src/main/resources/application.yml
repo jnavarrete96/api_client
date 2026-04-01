@@ -15,7 +15,7 @@ spring:
 logging:
   level:
     root: INFO
-    com.digitalfactory.studentapi: DEBUG
+    com.api.client: DEBUG
     io.r2dbc: DEBUG
 
 server:
