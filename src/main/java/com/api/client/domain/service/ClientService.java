@@ -37,7 +37,7 @@ public class ClientService implements ClientUseCase {
         log.info("Creating client with email: {}", client.getEmail());
 
         return validateDateRange(client)
-                .then(checkDuplicateEmail(client))
+                .then(Mono.defer(() -> checkDuplicateEmail(client)))
                 .switchIfEmpty(Mono.defer(() -> repository.save(buildClient(client))))
                 .onErrorMap(this::isUnhandledException, ex -> ex);
     }
@@ -64,7 +64,7 @@ public class ClientService implements ClientUseCase {
                 .collectList()
                 .map(lines -> {
                     String header = "SharedKey,BusinessId,Email,Phone,StartDate,EndDate,DateAdded";
-                    return header + "\n" + String.join("\n", lines);
+                    return lines.isEmpty() ? header : header + "\n" + String.join("\n", lines);
                 });
     }
 
