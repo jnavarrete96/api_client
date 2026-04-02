@@ -21,13 +21,6 @@ public class DynamicQuery {
         }
     }
 
-    public void addFilter(String column, String param, Object value) {
-        if (value != null) {
-            sql.append(" AND ").append(column).append(" >= :").append(param);
-            bindings.add(q -> q.bind(param, value));
-        }
-    }
-
     public void addRangeFilter(String column, String param, Object value, boolean isUpper) {
         if (value != null) {
             String op = isUpper ? "<=" : ">=";
