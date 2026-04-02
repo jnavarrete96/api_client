@@ -56,12 +56,14 @@ public class ClientService implements ClientUseCase {
                         client.getSharedKey(),
                         client.getName(),
                         client.getEmail(),
-                        client.getPhone(),
+                        safeValue(client.getPhone()),
+                        client.getStartDate().toString(),
+                        safeDate(client.getEndDate()),
                         client.getDataAdded().toString()
                 ))
                 .collectList()
                 .map(lines -> {
-                    String header = "SharedKey,Name,Email,Phone,DateAdded";
+                    String header = "SharedKey,BusinessId,Email,Phone,StartDate,EndDate,DateAdded";
                     return header + "\n" + String.join("\n", lines);
                 });
     }
@@ -104,6 +106,14 @@ public class ClientService implements ClientUseCase {
 
     private String generateSharedKey(String name) {
         return name.toLowerCase().replace(" ", "_") + "_" + UUID.randomUUID().toString().substring(0, 6);
+    }
+
+    private String safeValue(String value) {
+        return value != null ? value : "";
+    }
+
+    private String safeDate(LocalDate date) {
+        return date != null ? date.toString() : "";
     }
 
 }
