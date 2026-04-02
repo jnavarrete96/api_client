@@ -36,18 +36,10 @@ public class ClientService implements ClientUseCase {
     public Mono<Client> createClient(Client client) {
         log.info("Creating client with email: {}", client.getEmail());
 
-        if (client.getEndDate() != null && client.getEndDate().isBefore(client.getStartDate())) {
-            return Mono.error(new InvalidDateRangeException());
-        }
-
-        return repository.findByEmail(client.getEmail())
-                .flatMap(existing -> {
-                    log.warn("Client already exists with email: {}", client.getEmail());
-                    return Mono.<Client>error(new DuplicateClientException(client.getEmail()));
-                })
-                .switchIfEmpty(
-                        Mono.defer(() -> repository.save(buildClient(client)))
-                );
+        return validateDateRange(client)
+                .then(checkDuplicateEmail(client))
+                .switchIfEmpty(Mono.defer(() -> repository.save(buildClient(client))))
+                .onErrorMap(this::isUnhandledException, ex -> ex);
     }
 
     @Override
@@ -72,6 +64,26 @@ public class ClientService implements ClientUseCase {
                     String header = "SharedKey,Name,Email,Phone,DateAdded";
                     return header + "\n" + String.join("\n", lines);
                 });
+    }
+
+    private Mono<Void> validateDateRange(Client client) {
+        if (client.getEndDate() != null && client.getEndDate().isBefore(client.getStartDate())) {
+            return Mono.error(new InvalidDateRangeException());
+        }
+        return Mono.empty();
+    }
+
+    private Mono<Client> checkDuplicateEmail(Client client) {
+        return repository.findByEmail(client.getEmail())
+                .flatMap(existing -> {
+                    log.warn("Client already exists with email: {}", client.getEmail());
+                    return Mono.<Client>error(new DuplicateClientException(client.getEmail()));
+                });
+    }
+
+    private boolean isUnhandledException(Throwable ex) {
+        return !(ex instanceof DuplicateClientException)
+                && !(ex instanceof InvalidDateRangeException);
     }
 
     private Client buildClient(Client client) {
